@@ -1,0 +1,30 @@
+---
+- hosts: tag_ansible_group_terraform_cicd_demo
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Ensure AS3 is running and available
+    uri:
+      url: "https://{{ ec2_ip_address }}/mgmt/shared/appsvcs/info"
+      user: "admin"
+      password: "{{ lookup('aws_ssm', '/infrastructure/credentials/bigip/' + ec2_ip_address + '/password', region='us-west-1' ) }}"
+      method: GET
+      force_basic_auth: true
+      status_code: 200
+      validate_certs: false
+    register: result
+    until: result.status == 200
+    retries: 240
+    delay: 5
+  - name: Apply AS3 Declaration
+    uri:
+      url: "https://{{ ec2_ip_address }}/mgmt/shared/appsvcs/declare"
+      user: "admin"
+      password: "{{ lookup('aws_ssm', '/infrastructure/credentials/bigip/' + ec2_ip_address + '/password', region='us-west-1' ) }}"
+      method: POST
+      body_format: "json"
+      body: "{{ lookup('template','templates/as3.j2') }}"
+      force_basic_auth: true
+      status_code: 200, 201
+      timeout: 60
+      validate_certs: false
