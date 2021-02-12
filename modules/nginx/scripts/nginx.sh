@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+# Connectivity check to see if NAT Gateway is up
+count=0
+while true
+do
+  if ping -c 1 -W 5 google.com 1>/dev/null 2>&1 
+  then
+    echo "Connected!"
+    break
+  elif [ $count -le 15 ]
+  then
+    echo "Not Connected!"
+    count=$[$count+1]
+  else
+    echo "Giving up"
+    break
+  fi
+  sleep 1
+done
+
 #Get IP
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 
