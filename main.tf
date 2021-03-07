@@ -2,22 +2,6 @@ locals {
   name_prefix = "cicd-demo"
 }
 
-data "aws_ssm_parameter" "bigiq_server" {
-  name = "/lab-parameters/f5/bigiq_server"
-}
-
-data "aws_ssm_parameter" "bigiq_username" {
-  name = "/lab-parameters/f5/bigiq_username"
-}
-
-data "aws_ssm_parameter" "bigiq_password" {
-  name = "/lab-parameters/f5/bigiq_password"
-}
-
-data "aws_ssm_parameter" "license_pool" {
-  name = "/lab-parameters/f5/license_pool"
-}
-
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.63.0"
@@ -79,7 +63,7 @@ resource "aws_lb_target_group_attachment" "external" {
 }
 
 module "f5_ltm" {
-  source = "github.com/tylerhatton/f5-bigip-tf-module"
+  source = "../f5-bigip-tf-module"
 
   count = var.bigip_count
 
@@ -96,10 +80,6 @@ module "f5_ltm" {
   management_ip     = "10.128.30.10${count.index}"
   include_public_ip = true
 
-  bigiq_server        = data.aws_ssm_parameter.bigiq_server.value
-  bigiq_username      = data.aws_ssm_parameter.bigiq_username.value
-  bigiq_password      = data.aws_ssm_parameter.bigiq_password.value
-  license_pool        = data.aws_ssm_parameter.license_pool.value
   provisioned_modules = ["\"ltm\": \"nominal\""]
 
   default_tags = {

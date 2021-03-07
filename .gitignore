@@ -4,3 +4,4 @@ terraform.tfstate.backup
 mykey*
 *.pem
 license.json
+*.tfvars
