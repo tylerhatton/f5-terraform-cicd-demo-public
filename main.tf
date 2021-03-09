@@ -63,7 +63,7 @@ resource "aws_lb_target_group_attachment" "external" {
 }
 
 module "f5_ltm" {
-  source = "../f5-bigip-tf-module"
+  source = "github.com/tylerhatton/f5-bigip-tf-module"
 
   count = var.bigip_count
 
